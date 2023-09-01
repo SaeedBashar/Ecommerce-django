@@ -1,0 +1,10 @@
+{% extends 'store/main.html' %}
+
+{% block content %}
+    <h3>Sign Up </h3>
+    <form method="post" action="/account/signup">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-outline-primary">Sign Up</button>
+    </form>
+{% endblock content %} 

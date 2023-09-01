@@ -1,0 +1,27 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+<nav class="navbar navbar-light bg-light">
+     <div class="row">
+      {% for product in products %}
+        <div class="col-lg-4">
+            <img class="thumbnail" src="{{ product.imageURL }}">
+            <div class="box-element product">
+                <h6><strong>{{ product.name }}</strong></h6>
+                <hr>
+                <div class="d-flex justify-content-between">
+                  {% if user.is_authenticated %}
+                    <div>
+                      <button data-product={{ product.id }} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                      <a class="btn btn-outline-primary" href="#">View</a>
+                    </div>
+                  {% endif%}
+                    <h4 class="d-flex">
+                      <strong>${{ product.price|floatformat:2 }}</strong>
+                    </h4>
+                </div>
+            </div>
+        </div>
+      {% endfor product in products %}
+    </div>
+{% endblock content %}
