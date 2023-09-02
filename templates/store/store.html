@@ -4,7 +4,7 @@
 <nav class="navbar navbar-light bg-light">
      <div class="row">
       {% for product in products %}
-        <div class="col-lg-4">
+        <div class="col-6 col-sm-4 my-2">
             <img class="thumbnail" src="{{ product.imageURL }}">
             <div class="box-element product">
                 <h6><strong>{{ product.name }}</strong></h6>
@@ -17,7 +17,7 @@
                     </div>
                   {% endif%}
                     <h4 class="d-flex">
-                      <strong>${{ product.price|floatformat:2 }}</strong>
+                      <strong>GHC {{ product.price|floatformat:2 }}</strong>
                     </h4>
                 </div>
             </div>
