@@ -13,7 +13,7 @@
                   {% if user.is_authenticated %}
                     <div>
                       <button data-product={{ product.id }} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-                      <a class="btn btn-outline-primary" href="#">View</a>
+                      <a class="btn btn-outline-primary" href="{% url 'product' product.id %}">View</a>
                     </div>
                   {% endif%}
                     <h4 class="d-flex">

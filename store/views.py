@@ -98,3 +98,15 @@ def processOrder(request):
         )
 
     return JsonResponse('Payment submitted..', safe=False)
+
+@login_required
+def product_detail(request, id):
+    data = cartData(request)
+
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
+
+    product = Product.objects.get(id=id)
+    context = {'items': items, 'order': order, 'cartItems': cartItems, 'product': product}
+    return render(request, 'store/product_detail.html', context)

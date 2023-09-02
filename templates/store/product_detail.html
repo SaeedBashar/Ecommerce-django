@@ -1,0 +1,25 @@
+{% extends 'store/main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="my-2">
+    <a class="btn btn-outline-primary" href="{% url 'store' %}">Back To Shop</a>
+
+</div>
+<div class="card" style="width: 18rem;">
+    <img src="{{product.imageURL}}" class="card-img-top" alt="...">
+    <div class="card-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <h4>Name - {{product.name}}</h4>
+        </li>
+        <li class="list-group-item">
+            <h5>Price - {{product.price}}</h5>
+        </li>
+      </ul>
+      <div>
+        <button data-product={{ product.id }} data-action="add" class="my-2 btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}
