@@ -1,7 +1,10 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
+
+	<div class="spinner"></div>
      <div class="row">
+		
 		<div class="col-lg-6">
 			<div class="box-element" id="form-wrapper">
 				<form id="form">
@@ -42,6 +45,18 @@
 
 			<br>
 			<div class="box-element hidden" id="payment-info">
+				<div class="card mb-3">
+					<div class="card-body momo-pay d-flex justify-content-end">
+						<button 
+							class="btn btn-warning" 
+							
+							data-toggle="modal" data-target="#momoNumberModal"
+						>
+							Pay with momo
+							<img class="row-image" src="/images/momo.jfif" />
+						</button>
+					</div>
+				</div>
 				<small>Paypal Options</small>
 				<!--<button class="btn btn-outline-dark" id="make-payment">Make payment</button>-->
 				<div id="paypal-button-container"></div>
@@ -59,15 +74,58 @@
 				<div class="cart-row">
 					<div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
 					<div style="flex:2"><p>{{item.product.name}}</p></div>
-					<div style="flex:1"><p>GHC {{item.product.price|floatformat:2}}</p></div>
+					<div style="flex:1"><p>GH₵ {{item.product.price|floatformat:2}}</p></div>
 					<div style="flex:1"><p>x{{item.quantity}}</p></div>
 				</div>
 				{% endfor %}
 				<h5>Items:   {{order.get_cart_items}}</h5>
-				<h5>Total:   GHC {{order.get_cart_total|floatformat:2}}</h5>
+				<h5>Total:   GH₵ {{order.get_cart_total|floatformat:2}}</h5>
 			</div>
 		</div>
 	</div>
+
+	
+  <!-- Modal -->
+  <div class="modal fade" id="momoNumberModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Momo Number</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body">
+			<div class="form-group">
+				<label>Enter Momo Number to use for transaction</label>
+				<input required class="form-control" type="text" id="momoPhone" name="phone" placeholder="024...">
+			</div>
+			<div class="form-group">
+				<label for="exampleFormControlTextarea1">Transaction Message</label>
+				<textarea class="form-control" id="momoMsg" rows="3"></textarea>
+			</div>
+		</div>
+		<div class="modal-footer">
+		  <button id="momoCancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+		  <button type="button" class="btn btn-primary" onclick="processMomo()">Submit</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
+  <button class="d-none" id="msgPB" data-toggle="modal" data-target="#MsgModal">.</button>
+  <div class="modal fade" id="MsgModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-body">
+			<h4 id="msgP"><h4>
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>
+		</div>
+	  </div>
+	</div>
+  </div>
 
      <script src="https://www.paypal.com/sdk/js?client-id=AX-VrJu4eVcZgosPFC05U3X6XhpsOyfGU-M3TmlAXB6f4Z6Di6VZIHzMseRlKX3dWyuKn8dFJzTvnnP4&currency=USD&disable-funding=credit"></script>
 
@@ -104,6 +162,7 @@
     </script>
 
 	<script type="text/javascript">
+		var _interval = null // For keeping track of momo approval status
 		var shipping = '{{order.shipping}}'
 
 		if (shipping == 'False'){
@@ -163,9 +222,6 @@
 	    		userFormData.email = form.email.value
 	    	}
 
-	    	console.log('Shipping Info:', shippingInfo)
-	    	console.log('User Info:', userFormData)
-
 	    	var url = "/process_order/"
 	    	fetch(url, {
 	    		method:'POST',
@@ -179,14 +235,63 @@
 	    	.then((response) => response.json())
 	    	.then((data) => {
 				console.log('Success:', data);
-				alert('Transaction completed');
-
+				document.getElementById("msgP").innerHTML = 'Transaction completed'
+				document.getElementById("momoCancel").click()
+				document.getElementById("msgPB").click()
 				cart = {}
 				document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
-
-				window.location.href = "{% url 'store' %}"
+				setTimeout(()=>window.location.href = "{% url 'store' %}", 2000)
 
 				})
 	    }
+
+		async function processMomo(){
+			document.querySelector(".spinner").style.display = "inline-block"
+			console.log('momo paying')
+			let phone = document.getElementById('momoPhone').value
+			let msg = document.getElementById('momoMsg').value
+			console.log(phone, msg)
+
+			let body = {
+				amount : {{order.get_cart_total}},
+				msg,
+				phone
+			}
+
+			console.log(body)
+			let data = await fetch("/process_momo",
+			{
+				method: "POST",
+				headers:{
+	    			'Content-Type':'application/json',
+	    			'X-CSRFToken':csrftoken,
+	    		},
+				body : JSON.stringify(body)
+			})
+			data = await data.json();
+
+			if(data.status){
+				_interval = setInterval(async()=>{
+					let res = await fetch("/verify_momo_tx/" + data.ref)
+					res = await res.json()
+					if(res.status){
+						document.getElementById("msgP").innerHTML = res.msg
+						document.getElementById("momoCancel").click()
+						document.getElementById("msgPB").click()
+						clearInterval(_interval)
+						setTimeout(()=>submitFormData(), 2000)
+						
+					}
+					document.querySelector(".spinner").style.display = "none"
+				}, 5000)
+
+			}else{
+				document.getElementById("msgP").innerHTML = data.msg
+				document.getElementById("momoCancel").click()
+				document.getElementById("msgPB").click()
+				document.querySelector(".spinner").style.display = "none"
+			}
+		}
 	</script>
+
 {% endblock content %}

@@ -13,6 +13,9 @@ pillow = "*"
 pytz = "==2021.1"
 sqlparse = "==0.4.2"
 urllib3 = "==1.26.6"
+django-crispy-forms = "*"
+basicauth = "*"
+requests = "*"
 
 [dev-packages]
 

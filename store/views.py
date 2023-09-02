@@ -7,7 +7,7 @@ import datetime
 
 from .models import *
 from .utils import cookieCart, cartData, guestOrder
-
+from .momo_pay import PayClass
 
 def store(request):
     
@@ -110,3 +110,34 @@ def product_detail(request, id):
     product = Product.objects.get(id=id)
     context = {'items': items, 'order': order, 'cartItems': cartItems, 'product': product}
     return render(request, 'store/product_detail.html', context)
+
+@login_required
+def processMomo(request):
+    if request.method == "POST":
+        body = json.loads(request.body)
+        try:
+            res = PayClass.momopay(
+                body["amount"], "EUR", 
+                "afrimart_purchase", 
+                "233" + body["phone"][1:], body["msg"])
+            print(res)
+            if(res["response"] == 200 or res["response"] == 201 or res["response"] == 202):
+                return JsonResponse({"status": True, "msg": "Transaction Processed", "ref": res["ref"]})
+            else:
+                return JsonResponse({"status": False, "msg": "Failed To Process Transaction"})
+                
+        except:
+            return JsonResponse({"status": False, "msg": "An error Occured While Processing"})
+        
+    else:
+        return JsonResponse({"status": False, "msg": "No Data To Process"})
+    
+@login_required
+def verifyMomoTX(request, ref):
+    res = PayClass.verifymomo(ref)
+    if res["status"] == "SUCCESSFUL":
+        return JsonResponse({"status": True, "msg": "Thank you for buying this item"})
+    else:
+        return JsonResponse({"status": False, "msg": "Transaction not approved"})
+
+        

@@ -1,10 +1,14 @@
 {% extends 'store/main.html' %}
 
 {% block content %}
-    <h3>Sign Up </h3>
+<div class="row justify-content-center">
+    <div class="col-sm-6 sign-in-form">
+        <h3 class="text-center">Sign Up</h3>
     <form method="post" action="/account/signup">
         {% csrf_token %}
         {{ form.as_p }}
-        <button class="btn btn-outline-primary">Sign Up</button>
+        <button class="btn btn-outline-primary btn-block">Sign Up</button>
     </form>
+</div>
+</div>
 {% endblock content %} 

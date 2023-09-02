@@ -96,8 +96,9 @@
                     </div>
                 {% else  %}
                     <a href="{% url 'login'%}"class="btn btn-outline-primary">Login</a>
-                    <a href="/admin"class="mx-2 btn btn-outline-primary">Admin Login</a>
                     <a href="{% url 'signup'%}"class="mx-2 btn btn-outline-primary">Register</a>
+                    <a class="divider"></a>
+                    <a href="/admin"class="mx-2 btn btn-outline-success">Admin Login</a>
                 {% endif %}
             </div>
 
