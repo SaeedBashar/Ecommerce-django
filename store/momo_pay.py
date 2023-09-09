@@ -9,10 +9,12 @@ class PayClass():
     # ================================================================================ Variables & Keys
 
     # Collections Subscription Key:
-    collections_subkey = "a8a2df9bf8594600bb3ecbe22317a1c0"
+    collections_subkey = "bb9a41036cd24428b49d392bde6ecb5e"
+    # collections_subkey = "a8a2df9bf8594600bb3ecbe22317a1c0"
 
     # Disbursement subscription key
-    disbursements_subkey = "841ae35587504777bc45158c9b8fdf22"
+    disbursements_subkey = "cefc331d9da4447999130b81cf230ccc"
+    # disbursements_subkey = "841ae35587504777bc45158c9b8fdf22"
 
     # Production collections basic authorisation key(Leave it blank if in sandbox mode)
     basic_authorisation_collections = ""

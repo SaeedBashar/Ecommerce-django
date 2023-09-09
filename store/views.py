@@ -1,13 +1,16 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 import json
 import datetime
 
 from .models import *
 from .utils import cookieCart, cartData, guestOrder
 from .momo_pay import PayClass
+
+def index(request):
+    return render(request, 'store/index.html')
 
 def store(request):
     
