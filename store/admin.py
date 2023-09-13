@@ -14,7 +14,13 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'email', 'user_id')
 
 class OrderAdmin(admin.ModelAdmin):
+    actions = None
     list_display = ('id', 'date_order', 'complete', 'transaction_id')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
 
 class ShippingAddressAdmin(admin.ModelAdmin):
     list_display = ('address', 'city', 'state', 'customer_id', 'order_id')
